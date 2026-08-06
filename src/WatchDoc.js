@@ -14,15 +14,17 @@ $(function() {
 	watchlink.click(function() {
 		mw.loader.using('mediawiki.page.watch.ajax').then(function(require) {
 			var clone = watchlink.clone().removeClass('loading'),
+				docTitle = title + '/doc',
+				shownDocTitle = mw.Title.newFromText(docTitle).getPrefixedText(),
 				oldNotify = mw.notify;
 
 			mw.notify = function(msg, opts) {
-				// Both the doc and non-doc messages need to be shown...
-				if (~msg.text().indexOf(title + '/doc')) opts.tag += '-doc';
+				// Change tag so both the doc and non-doc messages are shown
+				if (~msg.text().indexOf(shownDocTitle)) opts.tag += '-doc';
 				oldNotify(msg, opts);
 			};
 
-			require('mediawiki.page.watch.ajax').watchstar(clone, title + '/doc', function() {
+			require('mediawiki.page.watch.ajax').watchstar(clone, docTitle, function() {
 				mw.notify = oldNotify;
 			});
 
