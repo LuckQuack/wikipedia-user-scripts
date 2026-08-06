@@ -30,15 +30,22 @@ $(function() {
 		this.log(html, '#14866d');
 	};
 
-	Log.prototype.logMoveError = function(from, to, reasonHtml) {
-		this.logError(['Failed to move page ', this.createLink(from), ' to ', this.createLink(to), '. Reason: ', reasonHtml]);
+	Log.prototype.logInfo = function(html) {
+		this.log(html, '#222');
+	};
+
+	Log.prototype.logMoveError = function(from, to, reasonHtml, primary) {
+		var error = ['Failed to move', primary ? ' primary ' : ' ', 'page ', this.createLink(from), ' to ', this.createLink(to), '.'];
+		if (primary) error.push(' You can move the subpages only by holding shift while clicking the button.');
+		error.push(' Reason: ', reasonHtml);
+		this.logError(error);
 	};
 
 	Log.prototype.logMoveSuccess = function(from, to) {
 		this.logSuccess(['Successfully moved page ', this.createLink(from), ' to ', this.createLink(to), '.']);
 	};
 
-	function movePage(from, to, params, log, onSuccess) {
+	function movePage(from, to, params, log, primary, onSuccess) {
 		$.post(mw.config.get('wgScriptPath') + '/api.php', $.extend({
 			action: 'move',
 			from: from,
@@ -51,7 +58,7 @@ $(function() {
 			errorlang: 'uselang'
 		}, params)).done(function(response) {
 			if (response.errors) {
-				log.logMoveError(from, to, response.errors[0].html);
+				log.logMoveError(from, to, response.errors[0].html, primary);
 				return;
 			}
 
@@ -61,7 +68,7 @@ $(function() {
 				var talkFrom = (from.match(':') ? from.replace(':', ' talk:') : 'Talk:') + from,
 					talkTo = (to.match(':') ? to.replace(':', ' talk:') : 'Talk:') + to;
 
-				log.logMoveError(talkFrom, talkTo, response.move['talkmove-errors'][0].html);
+				log.logMoveError(talkFrom, talkTo, response.move['talkmove-errors'][0].html, primary);
 				return;
 			}
 
@@ -73,14 +80,17 @@ $(function() {
 		});
 	}
 
-	function moveSubpages() {
+	function movePageAndSubpages(subpagesOnly) {
 		$('#moveSubpages-log').remove();
-
 		var log = new Log();
 
 		if (mw.config.get('wgUserGroups').indexOf('extendedconfirmed') === -1) {
 			log.log('You must be at least extended confirmed.', 'red');
 			return;
+		}
+
+		if (subpagesOnly) {
+			log.logInfo('Moving subpages only. The main page will not be moved.');
 		}
 
 		var fromTitle = new mw.Title($('input[name="wpOldTitle"]').val()),
@@ -106,24 +116,53 @@ $(function() {
 			format: 'json',
 			formatversion: '2'
 		}).done(function(res) {
-			movePage(fromTitle.getPrefixedText(), toTitle.getPrefixedText(), params, log, function() {
+			var moveSubpages = function() {
 				var prefixRegex = new RegExp('^' + mw.util.escapeRegExp(fromTitle.getPrefixedText()));
 
 				res.query.allpages.forEach(function(info) {
 					if (info.title === fromTitle) return;
-
-					movePage(info.title, info.title.replace(prefixRegex, toTitle.getPrefixedText()), params, log);
+					movePage(info.title, info.title.replace(prefixRegex, toTitle.getPrefixedText()), params, log, false);
 				});
-			});
+			};
+
+			if (subpagesOnly) {
+				moveSubpages();
+				return;
+			}
+
+			movePage(fromTitle.getPrefixedText(), toTitle.getPrefixedText(), params, log, true, moveSubpages);
 		});
 	}
 
 	if (window.location.href.match('Special:MovePage') && !$('p:contains(\'This page has no subpages.\')')[0]) {
-		new OO.ui.ButtonWidget({
-			label: 'Move page and subpages',
-			flags: ['primary', 'progressive']
-		}).$element
-			.on('click', moveSubpages)
+		var baseLabel = 'Move page and subpages',
+			subpagesOnly = false,
+			btn = new OO.ui.ButtonWidget({
+				label: baseLabel,
+				flags: ['primary', 'progressive']
+			});
+
+		btn.$element
+			.on('click', function() {
+				movePageAndSubpages(subpagesOnly);
+			})
 			.appendTo($('button[name=wpMove]').parent().parent());
+
+		window.addEventListener('keydown', function(e) {
+			subpagesOnly = e.shiftKey;
+			btn.setLabel(subpagesOnly ? 'Move subpages only' : baseLabel);
+		});
+
+		window.addEventListener('keyup', function(e) {
+			if (e.key === 'Shift') {
+				subpagesOnly = false;
+				btn.setLabel(baseLabel);
+			}
+		});
+
+		window.addEventListener('blur', function() {
+			subpagesOnly = false;
+			btn.setLabel(baseLabel);
+		});
 	}
 });
