@@ -361,7 +361,7 @@ mw.hook('wikipage.content').add(function(content) {
 				' &bull; <a href="' + mw.config.get('wgScript') + '?title=Wikipedia:File_Upload_Wizard&withJS=MediaWiki:FileUploadWizard.js">Local</a>' +
 				' (<a href="' + mw.config.get('wgScript') + '?title=Special:Upload">plain</a>)' +
 				' &bull; <a href="https://en.wikipedia.org/wiki/User:BrandonXLF/FFUHelper">FFU Helper</a>' +
-				']</span>'
+				']</div>'
 			);
 
 		sectionElement.after(currentInterface);
@@ -393,7 +393,7 @@ mw.hook('wikipage.content').add(function(content) {
 			editLink.siblings().last().after($('<span>')
 				.css('background', color)
 				.addClass('mw-editsection')
-				.append('[')
+				.append('<span class="mw-editsection-bracket">[</span>')
 				.append($('<a>')
 					.text(type)
 					.attr('href', '#')
@@ -402,7 +402,7 @@ mw.hook('wikipage.content').add(function(content) {
 						openInterface(type, section, heading);
 					})
 				)
-				.append(']')
+				.append('<span class="mw-editsection-bracket">]</span>')
 			);
 		});
 	});
