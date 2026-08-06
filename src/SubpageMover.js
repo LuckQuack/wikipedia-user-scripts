@@ -81,7 +81,6 @@ $(function() {
 	}
 
 	function movePageAndSubpages(subpagesOnly) {
-		$('#moveSubpages-log').remove();
 		var log = new Log();
 
 		if (mw.config.get('wgUserGroups').indexOf('extendedconfirmed') === -1) {
