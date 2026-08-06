@@ -6,9 +6,16 @@
 
 $(function() {
 	if (mw.config.get('wgCanonicalSpecialPageName') != 'Contributions') return;
-	mw.loader.load(['mediawiki.special.changeslist.enhanced', 'jquery.makeCollapsible.styles', 'mediawiki.icon']);
+
+	mw.loader.load(['jquery.makeCollapsible.styles']);
+	mw.loader.addStyleTag(
+		'.contribs-by-page-arrow { display: inline-block; width: 10px; height: 10px; margin-right: 5px; opacity: var(--opacity-icon-base,0.87); background-position: center; transition: transform 250ms ease; }' +
+		'.contribs-by-page-arrow { background-image: url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="%23000"><path d="M5 8h10v1l-5 5-5-5z"/></svg>\'); }' +
+		'.contribs-by-page-arrow.mw-collapsible-toggle-collapsed { transform: rotate(-90deg); }'
+	);
+
 	var pages = {},
-		arrowClass = 'mw-collapsible-toggle mw-collapsible-arrow mw-enhancedchanges-arrow mw-enhancedchanges-arrow-space mw-collapsible-toggle-collapsed';
+		arrowClass = 'mw-collapsible-toggle mw-collapsible-toggle-collapsed contribs-by-page-arrow';
 
 	$('[data-mw-revid]').each(function() {
 		var title = $('.mw-contributions-title', this).attr('title');
