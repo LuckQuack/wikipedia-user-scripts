@@ -6,10 +6,15 @@
 
 $(function() {
 	var namespace = mw.config.get('wgNamespaceNumber'),
+		contentModel = mw.config.get('wgPageContentModel'),
 		title = mw.config.get('wgPageName'),
 		watchlink = $('#ca-watch a, #ca-unwatch a');
 
-	if (namespace !== 10 && namespace !== 11 || title.includes('/doc')) return;
+	if (
+		(namespace !== 10 && namespace !== 11) ||
+		(contentModel && contentModel !== 'wikitext') ||
+		title.includes('/doc')
+	) return;
 
 	watchlink.click(function() {
 		mw.loader.using('mediawiki.page.watch.ajax').then(function(require) {
