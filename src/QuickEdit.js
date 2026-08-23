@@ -125,14 +125,17 @@
 			title = decodeURIComponent(titleMatch[1] || titleMatch[2]),
 			sectionID = /[?&]v?e?section=T?-?(\d*)/.exec(targetEl.attr('href'))[1];
 
+		// Main page title support
 		if (!heading.closest('.mw-parser-output').length) {
 			var articleContent = $('#mw-content-text .mw-parser-output');
 
+			if (articleContent.children('section[data-mw-section-id="0"]').length) {
+				articleContent = articleContent.find('section[data-mw-section-id="0"]');
+			}
+
 			matcher = function(selector) {
 				var child = articleContent.children(selector).first();
-
-				if (child.length) return child.prevAll();
-				return articleContent.children();
+				return child.length ? child.prevAll() : articleContent.children();
 			};
 			inserter = articleContent.prepend.bind(articleContent);
 		}
@@ -169,7 +172,7 @@
 			for (var i = 2; i <= level; i++)
 				levelMatch += ',h' + i + ':has(*), .mw-heading' + i;
 
-			var partSection = matcher(':header:has(*), .mw-heading'),
+			var partSection = matcher(':header:has(*), .mw-heading, section[data-mw-section-id]'),
 				fullSection = matcher(levelMatch),
 				textarea = new OO.ui.MultilineTextInputWidget({
 					rows: 1,
