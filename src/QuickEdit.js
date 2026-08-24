@@ -115,22 +115,22 @@
 
 	function showEditor(el) {
 		var progress = new OO.ui.ProgressBarWidget(),
-			// https://www.mediawiki.org/wiki/Heading_HTML_changes
-			// Cannot use .closest() because DiscussionTools nests an h2 within a .mw-heading
-			heading = el.parents(':header, .mw-heading').last(),
+			// Cannot use .closest() because .mw-heading contains an header element
+			heading = el.parents('.mw-heading, :header').last(),
 			matcher = heading.nextUntil.bind(heading),
 			inserter = heading.after.bind(heading),
 			targetEl = el.siblings('.quickedit-target').last(),
 			titleMatch = targetEl.attr('href').match(titleRegexp),
 			title = decodeURIComponent(titleMatch[1] || titleMatch[2]),
-			sectionID = /[?&]v?e?section=T?-?(\d*)/.exec(targetEl.attr('href'))[1];
+			sectionID = /[?&]v?e?section=T?-?(\d*)/.exec(targetEl.attr('href'))[1],
+			headingChanges = !!$('#mw-content-text .mw-parser-output .mw-heading').length;
 
 		// Main page title support
 		if (!heading.closest('.mw-parser-output').length) {
 			var articleContent = $('#mw-content-text .mw-parser-output');
 
 			if (articleContent.children('section[data-mw-section-id="0"]').length) {
-				articleContent = articleContent.find('section[data-mw-section-id="0"]');
+				articleContent = articleContent.children('section[data-mw-section-id="0"]');
 			}
 
 			matcher = function(selector) {
@@ -168,12 +168,11 @@
 				return m;
 			});
 
-			var levelMatch = 'h1';
-			for (var i = 2; i <= level; i++)
-				levelMatch += ',h' + i + ':has(*), .mw-heading' + i;
+			var levelMatch = headingChanges ? '.mw-heading1' : 'h1:has(*)';
+			for (var i = 2; i <= level; i++) levelMatch += ',' + (headingChanges ? ('.mw-heading' + i) : ('h' + i + ':has(*)'));
 
-			var partSection = matcher(':header:has(*), .mw-heading, section[data-mw-section-id]'),
-				fullSection = matcher(levelMatch),
+			var partSection = matcher((headingChanges ? '.mw-heading' : ':header:has(*)') + ',section[data-mw-section-id]'),
+				fullSection = matcher(levelMatch), // Goes until end of section for Parsoid (no match)
 				textarea = new OO.ui.MultilineTextInputWidget({
 					rows: 1,
 					maxRows: 20,
