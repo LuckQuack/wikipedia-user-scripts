@@ -15,15 +15,19 @@ $(function() {
 	);
 
 	var pages = {},
-		arrowClass = 'mw-collapsible-toggle mw-collapsible-toggle-collapsed contribs-by-page-arrow';
+		arrowClass = 'mw-collapsible-toggle mw-collapsible-toggle-collapsed contribs-by-page-arrow',
+		allExpanded = false;
 
 	$('[data-mw-revid]').each(function() {
 		var title = $('.mw-contributions-title', this).attr('title');
-		if (!pages[title]) {
-			pages[title] = [];
-		}
+		if (!pages[title]) pages[title] = [];
 		pages[title].push(this);
 	});
+
+	function updateAllExpanded() {
+		allExpanded = $('.contribs-by-page-arrow.mw-collapsible-toggle-collapsed').length === 0;
+		$('.contribs-by-page-all').text(allExpanded ? 'Collapse all' : 'Expand all');
+	}
 
 	function merge(page) {
 		if (pages[page].length > 1) {
@@ -36,6 +40,8 @@ $(function() {
 						toggle.removeClass('mw-collapsible-toggle-expanded').addClass('mw-collapsible-toggle-collapsed');
 						sub.hide();
 					}
+
+					updateAllExpanded();
 				}),
 				head = $('<li class="multi">').append(
 					toggle,
@@ -86,4 +92,26 @@ $(function() {
 	}
 
 	for (var page in pages) merge(page);
+
+	$('.mw-pager-navigation-bar').each(function() {
+		$(this).append(' ');
+
+		$('<a href="#" class="contribs-by-page-all">Expand all</a>').click(function(e) {
+			console.log(allExpanded);
+
+			e.preventDefault();
+
+			if (!allExpanded) {
+				$('.contribs-by-page-arrow').removeClass('mw-collapsible-toggle-collapsed').addClass('mw-collapsible-toggle-expanded');
+				$('.contribs-by-page-arrow ~ ul').show();
+			} else {
+				$('.contribs-by-page-arrow').removeClass('mw-collapsible-toggle-expanded').addClass('mw-collapsible-toggle-collapsed');
+				$('.contribs-by-page-arrow ~ ul').hide();
+			}
+
+			updateAllExpanded();
+		}).appendTo(this);
+	});
+
+	updateAllExpanded();
 });
