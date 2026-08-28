@@ -35,7 +35,8 @@ $(function() {
 			'#ca-to-bottom { display: initial !important; }' +
 			'#ca-to-bottom-text { display: none !important; }' +
 			'#p-cactions #ca-to-bottom { display: none !important; }' +
-			'#p-cactions #ca-to-bottom-text { display: initial !important; }'
+			'#p-cactions #ca-to-bottom-text { display: initial !important; }' +
+			'.mw-ui-icon-portletlink-ca-to-bottom { mask-image: url(https://upload.wikimedia.org/wikipedia/commons/5/5f/Arrow_down_Pinhead_icon.svg); }'
 		);
 	}
 });
