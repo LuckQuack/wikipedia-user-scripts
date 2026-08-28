@@ -131,7 +131,7 @@ $.when(mw.loader.using('oojs-ui.styles.icons-movement'), $.ready).then(function(
 				if (e.target == $(this).find('a').get(0)) e.preventDefault();
 			});
 
-	opts.css({display: 'none', padding: '4px', border: '1px solid #999', borderRadius: '2px', position: 'absolute', background: '#fff'})
+	opts.css({display: 'none', padding: '4px', border: '1px solid #999', borderRadius: '2px', position: 'absolute', background: '#fff', zIndex: '10'})
 		.appendTo(link)
 		.append('<div style="margin-bottom:6px;font-weight:bold;text-align:center;">Saved config</div>')
 		.append(saved1.parent())
