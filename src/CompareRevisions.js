@@ -61,11 +61,6 @@ $.when(mw.loader.using('oojs-ui'), $.ready).then(function() {
 			)
 		);
 
-		bar.$element.css({
-			float: 'left',
-			margin: $('.ve-init-mw-diffPage-diffMode').length ? '0 0 0 8px' : '8px 0'
-		});
-
 		if ($('.ve-init-mw-diffPage-diffMode').length) {
 			$('.ve-init-mw-diffPage-diffMode').append(bar.$element);
 		} else if ($('.mw-revslider-container').length) {
