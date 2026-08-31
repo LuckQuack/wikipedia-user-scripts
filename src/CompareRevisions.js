@@ -64,9 +64,9 @@ $.when(mw.loader.using('oojs-ui'), $.ready).then(function() {
 		if ($('.ve-init-mw-diffPage-diffMode').length) {
 			$('.ve-init-mw-diffPage-diffMode').append(bar.$element);
 		} else if ($('.mw-revslider-container').length) {
-			$('.mw-revslider-container').after(bar.$element);
+			$('.mw-revslider-container').after($('<div>').append(bar.$element));
 		} else {
-			$('#mw-content-text').prepend(bar.$element);
+			$('#mw-content-text').prepend($('<div>').append(bar.$element));
 		}
 
 		bar.on('select', function(e) {
